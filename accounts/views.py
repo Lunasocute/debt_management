@@ -42,7 +42,7 @@ def get_accounts(request):
     accounts = Account.objects.all()
     min_balance = request.GET.get('min_balance')
     max_balance = request.GET.get('max_balance')
-    consumer_names = request.GET.getlist('consumer_name')
+    consumer_name = request.GET.get('consumer_name')
     status = request.GET.get('status')
 
     if min_balance:
@@ -51,10 +51,11 @@ def get_accounts(request):
     if max_balance:
         max_balance = Decimal(max_balance)
         accounts = accounts.filter(balance__lte=max_balance)
-    if consumer_names:
-        accounts = accounts.filter(consumers__name__in=consumer_names).distinct()
+    if consumer_name:
+        accounts = accounts.filter(consumers__name=consumer_name)
     if status:
-        status_val = 2 if status == 'IN_COLLECTION' else (1 if status == 'PAID_IN_FULL' else 0)
+        status_val = 2 if status == 'in_collection' else (1 if status == 'paid_in_full' else 0)
+        print("status_val:", status_val)
         accounts = accounts.filter(status=status_val)
     
     status_list = ['INACTIVE','PAID_IN_FULL','IN_COLLECTION']
@@ -64,14 +65,14 @@ def get_accounts(request):
         # Get related consumers
         client_reference_no = account.client_reference_no
         balance = account.balance
-        status = status_list[account.status]
+        curr_status = status_list[account.status]
         for consumer in account.consumers.all():
-            if consumer.name not in consumer_names:
+            if consumer_name and consumer.name != consumer_name:
                 continue
             combined_data.append({
                 'client_reference_no': client_reference_no,
                 'balance': balance,
-                'status': status,
+                'status': curr_status,
                 'consumers': consumer.name,
                 'address': consumer.address,
                 'ssn': consumer.ssn,
@@ -82,4 +83,6 @@ def get_accounts(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'account_list.html', {'page_obj': page_obj})
+    return render(request, 'account_list.html', 
+                  {'page_obj': page_obj, 'min_balance': min_balance, 'max_balance': max_balance, 
+                   'status':status, 'consumer_name':consumer_name})
