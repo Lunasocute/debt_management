@@ -60,7 +60,7 @@ def get_accounts(request):
     if status:
         collection = status == 'IN_COLLECTION' or status == 'in_collection'
         paid = status == 'PAID_IN_FULL' or status == 'paid_in_full'
-        status_val = 2 if collection else (1 if status == paid else 0)
+        status_val = 2 if collection else (1 if paid else 0)
         accounts = accounts.filter(status=status_val)
     
     # Combine Account and Consumer data for rendering
