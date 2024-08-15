@@ -42,7 +42,7 @@ def get_accounts(request):
     accounts = Account.objects.all()
     min_balance = request.GET.get('min_balance')
     max_balance = request.GET.get('max_balance')
-    consumer_name = request.GET.get('consumer_name')
+    consumer_names = request.GET.getlist('consumer_name')
     status = request.GET.get('status')
 
     if min_balance:
@@ -51,40 +51,31 @@ def get_accounts(request):
     if max_balance:
         max_balance = Decimal(max_balance)
         accounts = accounts.filter(balance__lte=max_balance)
-    if consumer_name:
-        accounts = accounts.filter(consumers__name=consumer_name)
+    if consumer_names:
+        accounts = accounts.filter(consumers__name__in=consumer_names).distinct()
     if status:
         status_val = 2 if status == 'IN_COLLECTION' else (1 if status == 'PAID_IN_FULL' else 0)
         accounts = accounts.filter(status=status_val)
     
+    status_list = ['INACTIVE','PAID_IN_FULL','IN_COLLECTION']
     # Combine Account and Consumer data for rendering
     combined_data = []
     for account in accounts:
         # Get related consumers
         client_reference_no = account.client_reference_no
         balance = account.balance
-        status = account.status
-        if consumer_name:
-            consumer = Consumer.objects.filter(name__=consumer_name)
+        status = status_list[account.status]
+        for consumer in account.consumers.all():
+            if consumer.name not in consumer_names:
+                continue
             combined_data.append({
                 'client_reference_no': client_reference_no,
                 'balance': balance,
                 'status': status,
-                'consumers': consumer_name,
+                'consumers': consumer.name,
                 'address': consumer.address,
                 'ssn': consumer.ssn,
-
             })
-        else:
-            for consumer in account.consumers.all():
-                combined_data.append({
-                    'client_reference_no': client_reference_no,
-                    'balance': balance,
-                    'status': status,
-                    'consumers': consumer.name,
-                    'address': consumer.address,
-                    'ssn': consumer.ssn,
-                })
 
     # Paginate the accounts
     paginator = Paginator(combined_data, 10)  # Show 10 accounts per page

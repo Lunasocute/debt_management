@@ -1,3 +1,7 @@
+<!DOCTYPE html>
+<html>
+<body>
+
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
@@ -11,3 +15,6 @@
         <p class="error">Failed to process the file.</p>
     {% endif %}
 {% endif %}
+
+</body>
+</html>
