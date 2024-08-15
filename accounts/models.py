@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from decimal import Decimal
+from user.models import MyUser
+
 # Create your models here.
 
 class Consumer(models.Model):
@@ -10,12 +12,6 @@ class Consumer(models.Model):
     
     def __str__(self):
         return self.name
-    
-class Agency(models.Model):
-    name = models.CharField(max_length=100)
-
-class Client(models.Model):
-    name = models.CharField(max_length=100)    
 
 class Account(models.Model):
     STATUS_CHOICES = [
@@ -27,8 +23,8 @@ class Account(models.Model):
     balance = models.DecimalField(max_digits=10, decimal_places=2)   # max balance 99999999.99
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     consumers = models.ManyToManyField(Consumer)
-    agency = models.ForeignKey(Agency, on_delete = models.CASCADE, null=True)   # Todo
-    client = models.ForeignKey(Client, on_delete = models.CASCADE, null=True)
+    agency = models.ForeignKey(MyUser, on_delete = models.CASCADE, null=True, related_name='agency_accounts')   # Todo
+    client = models.ForeignKey(MyUser, on_delete = models.CASCADE, null=True, related_name='client_accounts')   # Todo
 
     # Ensure balance is not negative
     def clean(self):

@@ -58,8 +58,8 @@ def get_accounts(request):
         print("status_val:", status_val)
         accounts = accounts.filter(status=status_val)
     
-    status_list = ['INACTIVE','PAID_IN_FULL','IN_COLLECTION']
     # Combine Account and Consumer data for rendering
+    status_list = ['INACTIVE','PAID_IN_FULL','IN_COLLECTION']
     combined_data = []
     for account in accounts:
         # Get related consumers
