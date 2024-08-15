@@ -1,0 +1,42 @@
+<table>
+    <thead>
+        <tr>
+            <th>Client Reference No</th>
+            <th>Balance</th>
+            <th>Status</th>
+            <th>Consumer Name</th>
+            <th>Consumer Address</th>
+            <th>SSN</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for combined_data in page_obj %}
+        <tr>
+            <td>{{ combined_data.client_reference_no }}</td>
+            <td>{{ combined_data.balance }}</td>
+            <td>{{ combined_data.status }}</td>
+            <td>{{ combined_data.consumers }}</td>
+            <td>{{ combined_data.address }}</td>
+            <td>{{ combined_data.ssn }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+        
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+        
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>

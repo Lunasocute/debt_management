@@ -1,0 +1,13 @@
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Upload File</button>
+</form>
+
+{% if success is not None %}
+    {% if success %}
+        <p class="success">File uploaded and processed successfully!</p>
+    {% else %}
+        <p class="error">Failed to process the file.</p>
+    {% endif %}
+{% endif %}
