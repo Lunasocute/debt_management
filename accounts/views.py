@@ -6,6 +6,9 @@ from .models import Account, Consumer
 from django.core.paginator import Paginator
 from decimal import Decimal
 
+# Endpoint for users upload the file, render the upload form
+# Read the csv first, then creat and add the data in
+# If the account reference name and consume already exist, just get that and modify
 @csrf_exempt
 def upload_file(request):
     if request.method == 'POST':
@@ -37,6 +40,7 @@ def upload_file(request):
         form = UploadCSVForm()
     return render(request, 'upload_file.html', {'form': form})
 
+# Endpoint for users filter using multiple parameters
 def get_accounts(request):
     # Filter Accounts based on request parameters
     accounts = Account.objects.all()
@@ -54,8 +58,9 @@ def get_accounts(request):
     if consumer_name:
         accounts = accounts.filter(consumers__name=consumer_name)
     if status:
-        status_val = 2 if status == 'in_collection' else (1 if status == 'paid_in_full' else 0)
-        print("status_val:", status_val)
+        collection = status == 'IN_COLLECTION' or status == 'in_collection'
+        paid = status == 'PAID_IN_FULL' or status == 'paid_in_full'
+        status_val = 2 if collection else (1 if status == paid else 0)
         accounts = accounts.filter(status=status_val)
     
     # Combine Account and Consumer data for rendering
